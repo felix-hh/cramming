@@ -10,7 +10,7 @@ path: data
 # data implementation:
 defaults:
   - data_structure: from-disk # can be LMDB or RAM or None to load directly from disk
-local_staging_dir: # Optionally copy a preprocessed dataset into this folder before loading it for training
+local_staging_dir: /mnt/WD14TB/felixh/workspace/cramming/outputs/staging # Optionally copy a preprocessed dataset into this folder before loading it for training
 forbid_dataset_preprocessing: False
 temporary_corpus: False # Save data directly into local staging dir, forget after use
 max_raw_chunk_size: 1e14
@@ -28,7 +28,7 @@ early_termination:
 
 # Batch size settings:
 # batch_size: This is handled in train after commit 982a4d33cd7f79a48b691114ae78f6ad1cdbee69
-microbatch_size: 128 # dont make it larger than batch_size...
+microbatch_size: 96 # dont make it larger than batch_size...
 
 # Basic pytorch settings
 threads: 32 # maximal number of cpu dataloader workers used per GPU, this value will never exceed num_gpus * num_physical threads
@@ -63,6 +63,7 @@ sharing_strategy: file_descriptor
 # Misc:
 enable_huggingface_offline_mode: False
 local_rank: # This is set automatically by the system_startup
+device: 0 # This is the GPU device that will be used
 
 push_to_huggingface_hub: False
 hf_directoy_name: "test-crammedBERT-c5" # set a clever name here!

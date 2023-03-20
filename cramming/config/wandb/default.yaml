@@ -1,4 +1,4 @@
 enabled: True
-entity: jonasgeiping # change this obviously ;>
-project: cramming-pretrain
+entity: felix-hh 
+project: bert-embedding-size
 tags: []

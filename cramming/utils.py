@@ -132,8 +132,9 @@ def system_startup(cfg):
         )
         log.setLevel(logging.INFO if is_main_process() else logging.ERROR)
     else:
+        # Not distributed
         os.environ["OMP_NUM_THREADS"] = str(min(torch.get_num_threads(), cfg.impl.threads))
-        global_rank = local_rank = 0
+        global_rank = local_rank = cfg.impl.device if hasattr(cfg.impl, "device") else 0
         cfg.impl.local_rank = local_rank
 
     # Construct setup dictionary:
@@ -145,9 +146,9 @@ def system_startup(cfg):
     setup = dict(device=device, dtype=dtype)
     python_version = sys.version.split(" (")[0]
 
-    if local_rank == 0:
-        log.info(f"Platform: {sys.platform}, Python: {python_version}, PyTorch: {torch.__version__}")
-        log.info(f"CPUs: {torch.get_num_threads()}, GPUs: {torch.cuda.device_count()} on {socket.gethostname()}.")
+    # if local_rank == 0:
+    log.info(f"Platform: {sys.platform}, Python: {python_version}, PyTorch: {torch.__version__}")
+    log.info(f"CPUs: {torch.get_num_threads()}, GPUs: {torch.cuda.device_count()} on {socket.gethostname()}.")
 
     # 100% reproducibility?
     if cfg.impl.deterministic:
@@ -470,3 +471,15 @@ def flatten(d, parent_key="", sep="_"):
         else:
             items.append((new_key, v))
     return dict(items)
+
+def print_model_size(model):
+    param_size = 0
+    for param in model.parameters():
+        param_size += param.nelement() * param.element_size()
+    buffer_size = 0
+    for buffer in model.buffers():
+        buffer_size += buffer.nelement() * buffer.element_size()
+
+    size_all_mb = (param_size + buffer_size) / 1024**2
+    print('model size: {:.3f}MB'.format(size_all_mb))
+    return
