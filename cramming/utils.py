@@ -20,6 +20,8 @@ import numpy as np
 import time
 import datetime
 import tempfile
+
+from cramming.config.wandb.schema import WandbConfig
 from .data.utils import checksum_config
 
 import logging
@@ -56,7 +58,8 @@ def main_launcher(cfg, main_fn, job_name=""):
     # Decide GPU and possibly connect to distributed setup
     setup = system_startup(cfg)
     # Initialize wanDB :>
-    if cfg.wandb.enabled:
+    wandb_cfg: WandbConfig = cfg.wandb
+    if wandb_cfg.enabled:
         _initialize_wandb(setup, cfg)
     log.info("--------------------------------------------------------------")
     log.info(f"--------------Launching {job_name} run! ---------------------")
@@ -434,6 +437,7 @@ def dump_metrics(cfg, metrics):
 
 
 def _initialize_wandb(setup, cfg):
+    wandb_cfg: WandbConfig= cfg.wandb
     if is_main_process():
         import wandb
 
@@ -441,12 +445,12 @@ def _initialize_wandb(setup, cfg):
         settings = wandb.Settings(start_method="thread")
         settings.update({"git_root": cfg.original_cwd})
         run = wandb.init(
-            entity=cfg.wandb.entity,
-            project=cfg.wandb.project,
+            entity=wandb_cfg.entity,
+            project=wandb_cfg.project,
             settings=settings,
             name=cfg.name,
             mode="disabled" if cfg.dryrun else None,
-            tags=cfg.wandb.tags if len(cfg.wandb.tags) > 0 else None,
+            tags=wandb_cfg.tags if len(wandb_cfg.tags) > 0 else None,
             config=config_dict,
         )
         run.summary["GPU"] = torch.cuda.get_device_name(device=setup["device"]) if torch.cuda.device_count() > 0 else ""
@@ -454,7 +458,8 @@ def _initialize_wandb(setup, cfg):
 
 
 def wandb_log(stats, cfg):
-    if cfg.wandb.enabled:
+    wandb_cfg: WandbConfig = cfg.wandb
+    if wandb_cfg.enabled:
         if is_main_process():
             import wandb
 

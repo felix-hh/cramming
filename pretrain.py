@@ -28,7 +28,7 @@ def main_training_process(cfg, setup):
         cfg.impl,
         setup=setup,
     )
-    model_engine.train(cfg.train.pretrain_in_train_mode)
+    model_engine.train(cfg.train.pretrain_in_train_mode) # sets train mode on the engine
     stats = defaultdict(list)
 
     # Start the clocks now:

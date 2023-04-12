@@ -35,7 +35,7 @@ def initialize_torch(model, dataset, tokenizer, cfg_train, cfg_impl, setup=_defa
         dataloader = None
 
     model_engine = TorchEngine(model, cfg_train, cfg_impl, setup=setup, seq_length=tokenizer.model_max_length)
-    model_engine.train()
+    model_engine.train() # sets a boolean flag causing the engine to be in train mode. Not actually doing anything extra. 
     return model_engine, model_engine.optimizer, model_engine.scheduler, dataloader
 
 

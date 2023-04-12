@@ -1,4 +1,6 @@
 outputs
+data
+staging
 tables/*/*.csv
 tables/*/*.csv#
 tables/*.csv
